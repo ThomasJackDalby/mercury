@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercury.Verifer", "Mercury.Verifier\Mercury.Verifer.csproj", "{B95779CC-E7B7-40C3-B662-147D0FD8C4FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercury.Entry", "Mercury.Entry\Mercury.Entry.csproj", "{6C4A903E-1A90-4374-A38D-E842757C6B41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercury.Core", "Mercury.Core\Mercury.Core.csproj", "{3EFA3BFB-BAE9-447D-BC4C-808CBEF559E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B95779CC-E7B7-40C3-B662-147D0FD8C4FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B95779CC-E7B7-40C3-B662-147D0FD8C4FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B95779CC-E7B7-40C3-B662-147D0FD8C4FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B95779CC-E7B7-40C3-B662-147D0FD8C4FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C4A903E-1A90-4374-A38D-E842757C6B41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C4A903E-1A90-4374-A38D-E842757C6B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C4A903E-1A90-4374-A38D-E842757C6B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C4A903E-1A90-4374-A38D-E842757C6B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EFA3BFB-BAE9-447D-BC4C-808CBEF559E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EFA3BFB-BAE9-447D-BC4C-808CBEF559E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EFA3BFB-BAE9-447D-BC4C-808CBEF559E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EFA3BFB-BAE9-447D-BC4C-808CBEF559E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
