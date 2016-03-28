@@ -1,0 +1,12 @@
+# ignore all files in bin folder etc
+bin/
+Mercury.Core/bin/
+Mercury.Core/obj/
+Mercury.Verifier/bin/
+Mercury.Verifier/obj/
+Mercury.Entry/bin/
+Mercury.Entry/obj/
+
+# ignore swap files
+*.swp
+*.*~
