@@ -19,30 +19,30 @@ namespace Mercury
         {
             Logger.MinLevel = Level.INFO;
 
-            int width = 100;
-            int height = 100;
-            int numPoints = 10;
+            int width = 5000;
+            int height = 5000;
+            //int numPoints = 20;
 
             Map.Save("map.txt", Map.Create(width, height));
 
-            Point[] points = Route.Create(numPoints, width, height);
-            Route.Save("route.txt", points, true);
+            //Point[] points = Route.Create(numPoints, width, height);
+            //Route.Save("route.txt", points, true);
 
             logger.Info("Mercury.Entry");
             int[][] map = Map.Load(args[0]);
             Point[] requiredRoute = Route.Load(args[1], true);
-            
-            // Task 3
-            calculateShortestRouteToVisitAllPoints(map, points);
 
-
-            //// Task 1
-            //Point[] route1 = calculateShortestRouteBetweenTwoPoints(map, requiredRoute[0], requiredRoute[1]);
-            //Route.Save("task1.txt", route1);
+            // Task 1
+            Point[] route1 = calculateShortestRouteBetweenTwoPoints(map, requiredRoute[0], requiredRoute[1]);
+            Route.Save("task1.txt", route1);
+            Map.Draw("task1.bmp", map, requiredRoute ,route1);
             //// Task 2
             //Point[] route2 = calcaulteShortedRouteFollowingPoints(map, requiredRoute);
             //Route.Save("task2.txt", route2);
-            //Map.Draw("task2.bmp", map, requiredRoute, route2);
+            //Map.Draw("task3.bmp", map, bestRoute, null);
+            //// Task 3
+            //Point[] bestRoute = calculateShortestRouteToVisitAllPoints(map, points);
+            //Route.Save("task3.txt", bestRoute);
         }
         
         private static Point[] calculateShortestRouteToVisitAllPoints(int[][] map, Point[] requiredPoints)
@@ -50,24 +50,109 @@ namespace Mercury
             logger.Info("Calculating shortest route to visit all {0} points", requiredPoints.Length);
 
             int[][] routeMap = calculateRouteMap(map, requiredPoints);
+            Point[] route = calculateOrderToVisitPoints(routeMap, requiredPoints);
+            Point[] fullRoute = loadPoints(route);
 
-            Point[] finalRoute = new Point[0];
-            return finalRoute;
+            return fullRoute;
+        }
+
+        private static Point[] loadPoints(Point[] route)
+        {
+            Point[] fullRoute = new Point[0];
+            for(int i=1;i<route.Length;i++)
+            {
+                Point from = route[i-1];
+                Point to = route[i];
+
+                string filenamea = String.Format("[{0}.{1}][{2}.{3}].txt", from.X, from.Y, to.X, to.Y);
+                string filenameb = String.Format("[{0}.{1}][{2}.{3}].txt", to.X, to.Y, from.X, from.Y);
+                Point[] subroute;
+                if (File.Exists(filenamea)) subroute = Route.Load(filenamea, false);
+                else if (File.Exists(filenameb)) subroute = Route.Load(filenameb, false);
+                else throw new Exception("Route not find");
+
+                fullRoute = ArrayTools.Append(fullRoute, subroute);
+            }
+            return fullRoute;
         }
 
         private static Point[] calculateOrderToVisitPoints(int[][] routeMap, Point[] requiredPoints)
         {
+            logger.Info("Calculating order to visit points", requiredPoints.Length);
             return bruteForce(routeMap, requiredPoints);
         }
-        private static Point[] bruteForce(int[][] routeMap, Point[] pointsLeft, Point[] pointsVisited, int distance)
+        private static Point[] bruteForce(int[][] routeMap, Point[] required)
         {
+            int bestDistance = Int32.MaxValue;
+            Point[] bestRoute = null;
 
+            for (int i = 0; i < required.Length;i++)
+            {
+                Point start = required[i];
+                logger.Info("Starting from {0}", start);
+
+                // Setup points left list
+                Point[] left = new Point[required.Length - 1];
+                for (int j = 0; j < i; j++) left[j] = required[j];
+                for (int j = i + 1; j < required.Length; j++) left[j-1] = required[j];
+
+                Point[] route = bruteForce(routeMap, required, left, new Point[] { start }, 0);
+                int routeDistance = calculateRouteDistance(required, route, routeMap);
+
+                if (routeDistance < bestDistance)
+                {
+                    bestRoute = route;
+                    bestDistance = routeDistance;
+                }
+            }
+            return bestRoute;
+        }
+        private static Point[] bruteForce(int[][] routeMap, Point[] required, Point[] pointsLeft, Point[] pointsVisited, int distance)
+        {
+            Point start = pointsVisited[pointsVisited.Length-1];
+            int startIndex = ArrayTools.IndexOf(required, start);
+
+            int bestDistance = (pointsLeft.Length == 0) ? distance : Int32.MaxValue;
+            Point[] bestRoute = (pointsLeft.Length == 0) ? pointsVisited : null;
             for (int i = 0; i < pointsLeft.Length; i++)
             {
-                    
+                Point end = pointsLeft[i];
 
+                // Setup points left list
+                Point[] left = new Point[pointsLeft.Length - 1];
+                for (int j = 0; j < i; j++) left[j] = pointsLeft[j];
+                for (int j = i+1; j < pointsLeft.Length; j++) left[j-1] = pointsLeft[j];
+                
+                // Setup points visited list
+                Point[] visited = new Point[pointsVisited.Length + 1];
+                for (int j = 0; j < pointsVisited.Length; j++) visited[j] = pointsVisited[j];
+                visited[visited.Length-1] = pointsLeft[i];
 
+                int endIndex = ArrayTools.IndexOf(required, end);
+                int additionalDist = routeMap[startIndex][endIndex];
+
+                Point[] route = bruteForce(routeMap, required, left, visited, additionalDist + distance);
+                int routeDistance = calculateRouteDistance(required, route, routeMap);
+
+                if (routeDistance < bestDistance)
+                {
+                    bestRoute = route;
+                    bestDistance = routeDistance;
+                }
             }
+            return bestRoute;
+        }
+
+        private static int calculateRouteDistance(Point[] required, Point[] route, int[][] routeMap)
+        {
+            int distance = 0;
+            for (int j = 1; j < route.Length; j++)
+            {
+                int a = ArrayTools.IndexOf(required, route[j - 1]);
+                int b = ArrayTools.IndexOf(required, route[j]);
+                distance += routeMap[a][b];
+            }
+            return distance;
         }
 
         private static int[][] calculateRouteMap(int[][] map, Point[] requiredPoints)
@@ -94,8 +179,10 @@ namespace Mercury
                     Point end = ends[j];
                     Point[] route = calculateShortestRouteThroughDistanceMap(distanceMap, start, end);
 
-                    string filename = String.Format("[{0}.{1}].txt", i, i + j + 1);
-                    Route.Save(filename, route);
+                    string filenamea = String.Format("[{0}.{1}][{2}.{3}].txt", start.X, start.Y, end.X, end.Y);
+                    string filenameb = String.Format("[{0}.{1}][{2}.{3}].txt", end.X, end.Y, start.X, start.Y);
+                    Route.Save(filenamea, route);
+                    Route.Save(filenameb, route);
 
                     int distance = distanceMap[end.Y][end.X];
 
@@ -133,19 +220,28 @@ namespace Mercury
             logger.Info("Calculating a distance map...");
             int[][] distanceMap = ArrayTools.Create(Int32.MaxValue, map.Length, map[0].Length);
 
-            List<Point> pointQueue = new List<Point>();
+            List<Point> pointQueue = new List<Point>(2*map.Length);
             pointQueue.Add(start);
             distanceMap[start.Y][start.X] = 0;
 
             List<Point> left = new List<Point>(ends);
 
             logger.Info("Processing points...");
+            int iteration = 0;
+            DateTime startTime = DateTime.Now;
             while (pointQueue.Count > 0)
             {
-                int[] distances = (from p in pointQueue select distanceMap[p.Y][p.X]).ToArray();
-                int minIndex = ArrayTools.MinIndex(distances);
+                if (iteration % 10000 == 0)
+                {
+                    TimeSpan span = DateTime.Now - startTime;
+                    string spanS = String.Format("{0}", span);
+                    logger.Info("{0,-10} at {1,-10} Q {2,-10}", iteration, spanS, pointQueue.Count);
+                }
+                iteration++;
 
-                Point c = pointQueue[minIndex];
+                //int[] distances = (from p in pointQueue select distanceMap[p.Y][p.X]).ToArray();
+                //int minIndex = ArrayTools.MinIndex(distances);
+                Point c = ArrayTools.MinFor<Point>(pointQueue, p => distanceMap[p.Y][p.X]);
 
                 for (int i = 0; i < left.Count; i++)
                 {

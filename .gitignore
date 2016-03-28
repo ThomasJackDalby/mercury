@@ -10,3 +10,7 @@ Mercury.Entry/obj/
 # ignore swap files
 *.swp
 *.*~
+
+# ignore reports
+*.psess
+*.vsp

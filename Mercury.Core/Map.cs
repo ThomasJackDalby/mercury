@@ -65,6 +65,11 @@ namespace Mercury.Core
         }
         public static void Draw(string filename, int[][] map, Point[] route, Point[] actual)
         {
+            Draw(filename, map, route, actual, true);
+        }
+        
+        public static void Draw(string filename, int[][] map, Point[] route, Point[] actual, bool grayscale)
+        {
             int height = map[0].Length;
             int width = map.Length;
             Drawing.Bitmap bitmap = new Drawing.Bitmap(width, height);
@@ -72,7 +77,8 @@ namespace Mercury.Core
             int min = ArrayTools.Min(map);
             int max = ArrayTools.Max(map, Int32.MaxValue);
 
-            double delta = 360.0 / (max - min);
+            double range = (grayscale) ? 1 : 360.0;
+            double delta = range / (max - min);
 
             for (int y = 0; y < height; y++)
             {
@@ -91,9 +97,18 @@ namespace Mercury.Core
                     }
                     else
                     {
-                        hue = (value * delta) + min;
-                        sat = 1;
-                        val = 1;
+                        if (grayscale)
+                        {
+                            hue = 0;
+                            sat = 0;
+                            val = (value * delta);
+                        }
+                        else
+                        {
+                            hue = (value * delta);
+                            sat = 1;
+                            val = 1;
+                        }
                     }
 
                     double[] rgb = Tools.HSVtoRGB(hue, sat, val);
@@ -103,7 +118,7 @@ namespace Mercury.Core
             }
 
             Drawing.Graphics g = Drawing.Graphics.FromImage(bitmap);
-            Drawing.Pen p = new Drawing.Pen(Drawing.Brushes.Red);
+            Drawing.Pen p = (grayscale) ? new Drawing.Pen(Drawing.Brushes.Red) : new Drawing.Pen(Drawing.Brushes.Black);
             Drawing.Color actualColour = Drawing.Color.Blue;
             if (route != null)
             {

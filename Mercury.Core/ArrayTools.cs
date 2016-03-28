@@ -8,6 +8,15 @@ namespace Mercury.Core
 {
     public static class ArrayTools
     {
+        public static int IndexOf<T>(T[] array, T item)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (item.Equals(array[i])) return i;
+            }
+            return -1;
+        }
+
         public static bool AreEqual(int[] a, int[] b)
         {
             if (a[0] != b[0]) return false;
@@ -103,6 +112,24 @@ namespace Mercury.Core
                 }
             }
             return minIndex;
+        }
+
+
+        public delegate int Evalulator<T>(T item);
+        public static T MinFor<T>(IList<T> array, Evalulator<T> eval)
+        {
+            int minValue = Int32.MaxValue;
+            int minIndex = 0;
+            for (int i = 0; i < array.Count; i++)
+            {
+                int eVal = eval(array[i]);
+                if (eVal < minValue)
+                {
+                    minValue = eVal;
+                    minIndex = i;
+                }
+            }
+            return array[minIndex];
         }
 
 
