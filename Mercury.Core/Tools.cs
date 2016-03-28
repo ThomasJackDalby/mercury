@@ -8,7 +8,16 @@ namespace Mercury.Core
 {
     public static class Tools
     {
-        public static List<double> HSVtoRGB(List<double> hsv)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hsv">
+        /// 0 < hue < 360
+        /// 0 < sat < 1
+        /// 0 < val < 1
+        /// </param>
+        /// <returns></returns>
+        public static double[] HSVtoRGB(params double[] hsv)
         {
             int i;
             double f, p, q, t;
@@ -16,34 +25,21 @@ namespace Mercury.Core
             double hue = hsv[0];
             double saturation = hsv[1];
             double value = hsv[2];
+
             if (saturation == 0) // Grey
             {
-
                 red = green = blue = value;
-                return new List<double>() { red, green, blue };
+                return new double[] { red, green, blue };
             }
 
-            hue
-
-            /= 60;
-            i
-
-            = (int)Math.Floor(hue);
-            f
-
-            = hue - i;
-            p
-
-            = value * (1 - saturation);
-            q
-
-            = value * (1 - saturation * f);
-            t
-
-            = value * (1 - saturation * (1 - f));
+            hue /= 60;
+            i = (int)Math.Floor(hue);
+            f = hue - i;
+            p = value * (1 - saturation);
+            q = value * (1 - saturation * f);
+            t = value * (1 - saturation * (1 - f));
             switch (i)
             {
-
                 case 0:
                     red = value;
                     green = t;
@@ -76,18 +72,16 @@ namespace Mercury.Core
                     break;
             }
 
-            return new List<double>() { red, green, blue };
+            return new double[] { red, green, blue };
         }
         public static int Max(params int[] nums)
         {
-
             int i = 0;
             for (int j = 0; j < nums.Length; j++) if (nums[j] > nums[i]) i = j;
             return i;
         }
         public static int Min(params int[] nums)
         {
-
             int i = 0;
             for (int j = 0; j < nums.Length; j++) if (nums[j] < nums[i]) i = j;
             return i;

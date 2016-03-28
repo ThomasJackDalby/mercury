@@ -53,7 +53,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Mecury.Core\Mercury.Core.csproj">
+    <ProjectReference Include="..\Mercury.Core\Mercury.Core.csproj">
       <Project>{3efa3bfb-bae9-447d-bc4c-808cbef559e5}</Project>
       <Name>Mercury.Core</Name>
     </ProjectReference>

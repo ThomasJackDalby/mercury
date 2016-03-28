@@ -20,7 +20,7 @@ namespace Mercury.Core
             for (int i = 0; i < height; i++)
             {
                 int[] line = new int[width];
-                for (int j = 0; j < width; j++) line[j] = r.Next(10);
+                for (int j = 0; j < width; j++) line[j] = r.Next(1, 10);
                 map[i] = line;
             }
 
@@ -59,38 +59,88 @@ namespace Mercury.Core
             logger.Info("Loaded map of {0} x {1}", width, height);
             return map;
         }
-        private static void Draw(string filename, int[][] map)
+        public static void Draw(string filename, int[][] map)
         {
             Draw(filename, map, null, null);
         }
-        private static void Draw(string filename, int[][] map, int[][] route, int[][] actual)
+        public static void Draw(string filename, int[][] map, Point[] route, Point[] actual)
         {
             int height = map[0].Length;
             int width = map.Length;
             Drawing.Bitmap bitmap = new Drawing.Bitmap(width, height);
-            double delta = (255.0 / 10);
-            double hue = 0;
-            double sat = 0;
-            //double val = 255;
-            for (int i = 0; i < height; i++)
+
+            int min = ArrayTools.Min(map);
+            int max = ArrayTools.Max(map, Int32.MaxValue);
+
+            double delta = 360.0 / (max - min);
+
+            for (int y = 0; y < height; y++)
             {
-                for (int j = 0; j < width; j++)
+                for (int x = 0; x < width; x++)
                 {
-                    int value = map[i][j];
-                    double val = value * delta;
-                    IList<double> rgb = Tools.HSVtoRGB(new List<double>() { hue, sat, val });
-                    Drawing.Color colour = Drawing.Color.FromArgb(255, (byte)rgb[0], (byte)rgb[1], (byte)rgb[2]);
-                    bitmap.SetPixel(j, i, colour);
+                    int value = map[y][x];
+                    double hue;
+                    double sat;
+                    double val;
+
+                    if (value >= Int32.MaxValue)
+                    {
+                        hue = 0;
+                        sat = 1;
+                        val = 0;
+                    }
+                    else
+                    {
+                        hue = (value * delta) + min;
+                        sat = 1;
+                        val = 1;
+                    }
+
+                    double[] rgb = Tools.HSVtoRGB(hue, sat, val);
+                    Drawing.Color colour = Drawing.Color.FromArgb(255, (byte)(rgb[0] * 255), (byte)(rgb[1] * 255), (byte)(rgb[2] * 255));
+                    bitmap.SetPixel(x, y, colour);
                 }
             }
 
             Drawing.Graphics g = Drawing.Graphics.FromImage(bitmap);
             Drawing.Pen p = new Drawing.Pen(Drawing.Brushes.Red);
-            for (int i = 1; i < route.Length; i++)
+            Drawing.Color actualColour = Drawing.Color.Blue;
+            if (route != null)
             {
-                g.DrawLine(p, new Drawing.Point(route[i - 1][0], route[i - 1][1]), new Drawing.Point(route[i][0], route[i][1]));
+                for (int i = 1; i < route.Length; i++)
+                {
+                    g.DrawLine(p, new Drawing.Point(route[i - 1].X, route[i - 1].Y), new Drawing.Point(route[i].X, route[i].Y));
+                }
+            }
+            if (actual != null)
+            {
+                for (int i = 0; i < actual.Length; i++)
+                {
+                    bitmap.SetPixel(actual[i].X, actual[i].Y, actualColour);
+                }
             }
             bitmap.Save(filename);
+        }
+        public static void Log(int[][] map)
+        {
+            for (int i = 0; i < map.Length; i++)
+            {
+                string[] line = new string[map[i].Length];
+                for (int j = 0; j < map[i].Length; j++)
+                {
+                    line[j] = map[i][j].ToString();
+                }
+                logger.Info(String.Join(",", line));
+            }
+        }
+
+        public static bool IsPointInsideMap(int[][] map, Point point)
+        {
+            if (point.X < 0) return false;
+            else if (point.X >= map.Length) return false;
+            else if (point.Y < 0) return false;
+            else if (point.Y >= map[0].Length) return false;
+            else return true;
         }
     }
 }

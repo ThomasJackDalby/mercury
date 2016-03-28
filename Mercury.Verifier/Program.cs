@@ -2,7 +2,6 @@
 using Sloth;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,12 +18,12 @@ namespace Mercury.Verifier
         {
             logger.Info("Verifier");
 
-            int width = 10;
-            int height = 10;
-            int numPoints = 5;
+            int width = 500;
+            int height = 500;
+            int numPoints = 2;
             int[][] map = Map.Create(width, height);
             Map.Save("map.txt", map);
-            int[][] points = Route.Create(numPoints, width, height);
+            Point[] points = Route.Create(numPoints, width, height);
             Route.Save("route.txt", points, true);
             //drawMap(map, points, null);
 
